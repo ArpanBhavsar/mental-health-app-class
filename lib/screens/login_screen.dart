@@ -1,8 +1,10 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:359115864.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:3954667322.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:2684412556.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:3105807845.
 import 'package:flutter/material.dart';
 import 'package:myapp/screens/signup_screen.dart';
+import 'package:myapp/screens/chat_screen.dart';
 import 'package:myapp/screens/forgot_password_screen.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -88,10 +90,15 @@ class _LogInScreenState extends State<LogInScreen> {
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Handle login logic here
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Processing Data')),
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(),
+                        ),
+                            (route) => false,
                       );
+                      
+                    
                     }
                   },
                   child: const Text('Log In'),
