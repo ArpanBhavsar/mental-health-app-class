@@ -3,11 +3,15 @@
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:3454752769.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:3864710561.
 import 'package:flutter/material.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 
+import 'screens/demo_ai_screen.dart';
 import 'screens/signup_screen.dart';
 
+const apiKey = '--';
 
 void main() {
+  Gemini.init(apiKey: apiKey);
   runApp(const MyApp());
 }
 
@@ -59,7 +63,7 @@ class MyApp extends StatelessWidget {
     useMaterial3: true,
   ),
 
-      home: const SignUpScreen(),
+      home: const DemoAIScreen(),
     );
   }
 }
