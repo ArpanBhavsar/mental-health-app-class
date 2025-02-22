@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 
+import 'screens/chat_screen.dart';
 import 'screens/demo_ai_screen.dart';
 import 'screens/signup_screen.dart';
 
@@ -63,7 +64,7 @@ class MyApp extends StatelessWidget {
     useMaterial3: true,
   ),
 
-      home: const DemoAIScreen(),
+      home: const ChatScreen(),
     );
   }
 }

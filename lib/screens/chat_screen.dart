@@ -1,8 +1,13 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:4219870950.
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:551127916.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:1975390785.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:764376108.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:1164116620.
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -12,12 +17,9 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final List<ChatMessage> _messages = [
-    ChatMessage(text: "Hello!", sender: "user"),
-    ChatMessage(text: "Hi there!", sender: "sender"),
-    ChatMessage(text: "How are you?", sender: "user"),
-    ChatMessage(text: "I'm good, thanks!", sender: "sender"),
-  ];
+  final gemini = Gemini.instance;
+
+  final List<ChatMessage> _messages = [];
 
   final TextEditingController _textController = TextEditingController();
 
@@ -26,37 +28,47 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _messages.insert(0, ChatMessage(text: text, sender: "user"));
     });
+    List<Content> chatHistory = [];
+    for (var message in _messages) {
+      chatHistory.add(Content(parts: [Part.text(message.text)], role: message.sender));
+    }
+    gemini
+        .chat(chatHistory.reversed.toList())
+        .then((value) {
+          if(value?.output != null){
+            setState(() {
+              _messages.insert(
+                0,
+                ChatMessage(text: value?.output ?? '', sender: "model"),
+              );
+            });
+          }else{
+             log("response was null");
+          }
+        })
+        .catchError((e) => log('chat', error: e));
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chat'),
-      ),
+      appBar: AppBar(title: const Text('Chat')),
       drawer: Drawer(
         backgroundColor: Theme.of(context).primaryColor,
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,),
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
               child: Text(
                 'Options',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
-            ListTile(
-              title: const Text('Mood Logging'),
-              onTap: () {},
-            ),
+            ListTile(title: const Text('Mood Logging'), onTap: () {}),
             ListTile(title: const Text('Journaling'), onTap: () {}),
-          ]),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -64,9 +76,8 @@ class _ChatScreenState extends State<ChatScreen> {
             child: ListView.builder(
               reverse: true,
               itemCount: _messages.length,
-              itemBuilder: (context, index) => ChatBubble(
-                message: _messages[index],
-              ),
+              itemBuilder:
+                  (context, index) => ChatBubble(message: _messages[index]),
             ),
           ),
           _buildTextComposer(),
@@ -117,19 +128,23 @@ class ChatBubble extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: Row(
-        mainAxisAlignment: message.sender == "user"
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            message.sender == "user"
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-              color: message.sender == "user"
-                  ? Colors.blue[100]
-                  : Colors.grey[200],
-              borderRadius: BorderRadius.circular(10.0),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color:
+                    message.sender == "user"
+                        ? Colors.blue[100]
+                        : Colors.grey[200],
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Text(message.text),
             ),
-            child: Text(message.text),
           ),
         ],
       ),
