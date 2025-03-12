@@ -119,7 +119,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                   (Route<dynamic> route) => false,
                                 );
                               } else {
-                                final responseData = jsonDecode(response);
+                                final responseData = jsonDecode(response.body);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(responseData["message"]),
