@@ -150,22 +150,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             setState(() {
                               _isLoading = false;
 
-                              if (response['error'] != null) {
-                                final responseData = jsonDecode(response['body']);
-
-                                print(responseData["message"]);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(responseData["message"])),
-                                );
-                                return;
-                              } else {
+                              if (response.statusCode >= 200 &&
+                                  response.statusCode < 300) {
                                 Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                     builder: (context) => const LogInScreen(),
                                   ),
                                   (Route<dynamic> route) => false,
                                 );
+                              } else {
+                                final responseData = jsonDecode(response);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(responseData["message"]),
+                                  ),
+                                );
                               }
+                              
                             });
                           }
                         },

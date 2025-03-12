@@ -3,19 +3,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const baseUrl = 'https://3000-idx-mental-health-api-1740596105591.cluster-pb4ljhlmg5hqsxnzpc56r3prxw.cloudworkstations.dev/';
+  static const baseUrl =
+      'https://3000-idx-mental-health-api-1740596105591.cluster-pb4ljhlmg5hqsxnzpc56r3prxw.cloudworkstations.dev/';
 
   //Handle API response
   static dynamic _processResponse(http.Response response) {
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      return response.body;
-    } else {
-      return {
-        "error": "Request failed",
-        "statusCode": response.statusCode,
-        "body": response.body,
-      };
-    }
+    return response;
+    // if (response.statusCode >= 200 && response.statusCode < 300) {
+    //   return response.body;
+    // } else {
+    //   return {
+    //     "error": "Request failed",
+    //     "statusCode": response.statusCode,
+    //     "body": response.body,
+    //   };
+    // }
   }
 
   //Generic GET request
