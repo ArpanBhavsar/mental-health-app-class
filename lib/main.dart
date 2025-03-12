@@ -1,12 +1,7 @@
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:907554284.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:4213831345.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3454752769.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3864710561.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 
-import 'screens/chat_screen.dart';
-import 'screens/demo_ai_screen.dart';
 import 'screens/signup_screen.dart';
 
 const apiKey = '--';
@@ -28,12 +23,10 @@ class MyApp extends StatelessWidget {
       ThemeData(
     colorScheme: ColorScheme.light(
       primary: const Color(0xFFBBDEFB), // Light Blue
-      secondary: const Color(0xFFF0F0F0), // Light Gray
-      background: const Color(0xFFFFFFFF), // White
+      secondary: const Color(0xFFF0F0F0), // White
       surface: const Color(0xFFF0F0F0), // Light Gray
       onPrimary: const Color(0xFF1976D2), // Dark Blue (text on light blue)
       onSecondary: const Color(0xFF000000), //Black
-      onBackground: const Color(0xFF000000), //Black
       onSurface: const Color(0xFF000000), //Black
       onError: Colors.white, // white
       error: Colors.red, //red
@@ -64,7 +57,7 @@ class MyApp extends StatelessWidget {
     useMaterial3: true,
   ),
 
-      home: const ChatScreen(),
+      home: const SignUpScreen(),
     );
   }
 }
