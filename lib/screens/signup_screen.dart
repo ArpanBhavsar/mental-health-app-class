@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:myapp/screens/login_screen.dart';
 
+import 'package:crypto/crypto.dart';
 import '../services/api_service.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -141,12 +142,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             setState(() {
                               _isLoading = true;
                             });
+
+                            var passwordBytes = utf8.encode(_passwordController.text);
+                            var passwordDigest = sha256.convert(passwordBytes);
+
                             var response = await ApiService.post('signup', {
                               'name': _nameController.text,
                               'email': _emailController.text,
-                              'password': _passwordController.text,
+                              'password': passwordDigest.toString(),
                             });
-
                             setState(() {
                               _isLoading = false;
 
