@@ -2,6 +2,8 @@
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:1184206053.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:2063831658.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:227314272.
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:myapp/screens/login_screen.dart';
 
@@ -149,9 +151,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               _isLoading = false;
 
                               if (response['error'] != null) {
-                                print(response.body);
+                                final responseData = jsonDecode(response['body']);
+
+                                print(responseData["message"]);
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(response['body'])),
+                                  SnackBar(content: Text(responseData["message"])),
                                 );
                                 return;
                               } else {
