@@ -1,13 +1,10 @@
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:4219870950.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:551127916.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:1975390785.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:764376108.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:1164116620.
-
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:2241137767.
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:myapp/screens/login_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -67,6 +64,19 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             ListTile(title: const Text('Mood Logging'), onTap: () {}),
             ListTile(title: const Text('Journaling'), onTap: () {}),
+            ListTile(title: const Text('Log Out'), onTap: () async {
+              
+              final prefs = await SharedPreferences.getInstance();
+              prefs.remove("userId");
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const LogInScreen(),
+                ),
+                (route) => false,
+              );
+              
+
+            }),
           ],
         ),
       ),
