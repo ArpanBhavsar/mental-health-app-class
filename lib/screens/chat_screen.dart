@@ -27,7 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late final GenerativeModel model;
   late final String chatSessionId;
   late final String userId;
-  late final String chatName;
+  late String chatName;
 
   @override
   void initState() {
@@ -97,7 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
       final prompt =
-          'Summarize this conversation between user and AI to give it a chat name to recognise later on. Conversation : $messageHistory';
+          'Summarize this conversation between user and AI to give it a chat name to recognise later on.  Focus on user\'s feelings and regarding what. Conversation : $messageHistory';
       final content = [Content.text(prompt)];
       final response = await chatNameModel.generateContent(content);
       setState(() {
@@ -129,7 +129,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (response.text != null) {
         _messages.insert(
           0,
-          ChatMessage(text: response.text!, sender: "Aura AI"),
+          ChatMessage(text: response.text!, sender: "model"),
         );
       }
     });
@@ -166,7 +166,7 @@ class _ChatScreenState extends State<ChatScreen> {
         'chatName': chatName,
         'userId': userId,
         'message': response.text,
-        'role': 'Aura AI',
+        'role': 'model',
       });
 
       if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
