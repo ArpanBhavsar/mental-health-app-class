@@ -1,3 +1,4 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:2321873323.
 // Suggested code may be subject to a license. Learn more: ~LicenseLog:2241137767.
 import 'dart:convert';
 import 'dart:developer';
@@ -24,8 +25,9 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isLoading = false;
 
   late final GenerativeModel model;
-  late final chatSessionId;
-  late final userId;
+  late final String chatSessionId;
+  late final String userId;
+  late final String chatName;
 
   @override
   void initState() {
@@ -55,8 +57,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   _checkLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userId = prefs.getString('userId');
+    userId = prefs.getString('userId').toString();
     final now = DateTime.now().millisecondsSinceEpoch.toString();
+    chatName = 'Chat on ${now.toString()}';
     chatSessionId = sha256.convert(utf8.encode(userId + now)).toString();
   }
 
@@ -74,23 +77,70 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _messages.insert(0, ChatMessage(text: text, sender: "user"));
     });
+    if (_messages.length == 1) {
+      chatName = text;
+    }
+    if (_messages.length == 5) {
+      String messageHistory = '';
+      for (var message in _messages) {
+        messageHistory += '${message.sender}: ${message.text}\n';
+      }
+      final chatNameModel = GenerativeModel(
+        model: 'gemini-2.0-flash-lite',
+        apiKey: apiKey!,
+        generationConfig: GenerationConfig(
+          temperature: 1,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 8192,
+          responseMimeType: 'text/plain',
+        ),
+      );
+      final prompt =
+          'Summarize this conversation between user and AI to give it a chat name to recognise later on. Conversation : $messageHistory';
+      final content = [Content.text(prompt)];
+      final response = await chatNameModel.generateContent(content);
+      setState(() {
+        chatName = response.text!;
+        _isLoading = true;
+      });
+      var apiResponse = await ApiService.put('chat/$chatSessionId', {
+        'chatName': chatName,
+      });
+
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        final responseData = jsonDecode(apiResponse.body);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(responseData["message"])));
+      }
+    }
     final chat = model.startChat(history: chatHistory);
     final content = Content.text(text);
     final response = await chat.sendMessage(content);
     setState(() {
       if (response.text != null) {
-        _messages.insert(0, ChatMessage(text: response.text!, sender: "model"));
+        _messages.insert(
+          0,
+          ChatMessage(text: response.text!, sender: "Aura AI"),
+        );
       }
     });
 
     setState(() {
       _isLoading = true;
     });
-    final now = DateTime.now().millisecondsSinceEpoch.toString();
 
     var apiResponse = await ApiService.post('chat', {
       'chatSessionId': chatSessionId,
-      'chatName': 'Chat on ${now.toString()}',
+      'chatName': chatName,
       'userId': userId,
       'message': text,
       'role': 'user',
@@ -113,10 +163,10 @@ class _ChatScreenState extends State<ChatScreen> {
     if (response.text != null) {
       var apiResponse = await ApiService.post('chat', {
         'chatSessionId': chatSessionId,
-        'chatName': 'Chat on ${now.toString()}',
+        'chatName': chatName,
         'userId': userId,
         'message': response.text,
-        'role': 'model',
+        'role': 'Aura AI',
       });
 
       if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
@@ -138,27 +188,45 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat')),
-      drawer: NavDrawer(selectedIndex: 0,),
-      body: _isLoading ? const Center(child: CircularProgressIndicator()) : Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              reverse: true,
-              itemCount: _messages.length,
-              itemBuilder:
-                  (context, index) => ChatBubble(message: _messages[index]),
-            ),
-          ),
-          _buildTextComposer(),
-        ],
+      appBar: AppBar(
+        title: const Text('Chat'),
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.history))],
       ),
+      drawer: NavDrawer(selectedIndex: 0),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Container(
+                color: Theme.of(context).colorScheme.surface,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        reverse: true,
+                        itemCount: _messages.length,
+                        itemBuilder:
+                            (context, index) =>
+                                ChatBubble(message: _messages[index]),
+                      ),
+                    ),
+                    _buildTextComposer(),
+                  ],
+                ),
+              ),
     );
   }
 
   Widget _buildTextComposer() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).colorScheme.onSurface,
+            width: 1.0,
+          ),
+        ),
+      ),
       child: Row(
         children: [
           Flexible(
@@ -203,18 +271,19 @@ class ChatBubble extends StatelessWidget {
                 ? MainAxisAlignment.end
                 : MainAxisAlignment.start,
         children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                color:
-                    message.sender == "user"
-                        ? Colors.blue[100]
-                        : Colors.grey[200],
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Text(message.text),
+          Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.7,
             ),
+            padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              color:
+                  message.sender == "user"
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.secondary,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Text(message.text),
           ),
         ],
       ),
