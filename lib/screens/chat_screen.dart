@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myapp/screens/login_screen.dart';
 
 import '../services/api_service.dart';
+import '../widgets/nav_drawer.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -138,34 +139,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Chat')),
-      drawer: Drawer(
-        backgroundColor: Theme.of(context).primaryColor,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-              child: Text(
-                'Options',
-                style: TextStyle(color: Colors.white, fontSize: 24),
-              ),
-            ),
-            ListTile(title: const Text('Mood Logging'), onTap: () {}),
-            ListTile(title: const Text('Journaling'), onTap: () {}),
-            ListTile(
-              title: const Text('Log Out'),
-              onTap: () async {
-                final prefs = await SharedPreferences.getInstance();
-                prefs.remove("userId");
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LogInScreen()),
-                  (route) => false,
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: NavDrawer(selectedIndex: 0,),
       body: _isLoading ? const Center(child: CircularProgressIndicator()) : Column(
         children: [
           Expanded(

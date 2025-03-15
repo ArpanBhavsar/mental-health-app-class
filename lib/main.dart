@@ -24,12 +24,12 @@ class MyApp extends StatelessWidget {
       ThemeData(
     colorScheme: ColorScheme.light(
       primary: const Color(0xFFBBDEFB), // Light Blue
-      secondary: const Color(0xFFF0F0F0), // White
+      secondary: const Color(0xFFA5D6A7), // Green
       surface: const Color(0xFFF0F0F0), // Light Gray
       onPrimary: const Color(0xFF1976D2), // Dark Blue (text on light blue)
       onSecondary: const Color(0xFF000000), //Black
       onSurface: const Color(0xFF000000), //Black
-      onError: Colors.white, // white
+      onError: const Color(0xFFBBDEFB), // white
       error: Colors.red, //red
     ),
     // You can customize other aspects of the theme here, such as:
