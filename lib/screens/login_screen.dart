@@ -114,8 +114,9 @@ class _LogInScreenState extends State<LogInScreen> {
                                 'email': _emailController.text,
                                 'password': passwordDigest.toString(),
                               });
-                              setState(() async {
+                              setState(() {
                                 _isLoading = false;
+                              });
 
                                 if (response.statusCode >= 200 &&
                                     response.statusCode < 300) {
@@ -146,7 +147,6 @@ class _LogInScreenState extends State<LogInScreen> {
                                     ),
                                   );
                                 }
-                              });
                             }
                           },
                           child: const Text('Log In'),
