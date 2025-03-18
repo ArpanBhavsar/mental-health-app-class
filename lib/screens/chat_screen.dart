@@ -8,10 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:myapp/screens/login_screen.dart';
 
 import '../services/api_service.dart';
 import '../widgets/nav_drawer.dart';
+import 'chat_history_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -190,7 +190,15 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.history))],
+        actions: [IconButton(onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatHistoryScreen(userId: userId),
+            ),
+          );
+          
+        }, icon: Icon(Icons.history))],
       ),
       drawer: NavDrawer(selectedIndex: 0),
       body:
