@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:myapp/screens/chat_screen.dart';
 
 import '../models/chat_list_model.dart';
 import '../services/api_service.dart';
@@ -205,7 +206,15 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                         _deleteChat(chat.chatSessionId);
                       },
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  ChatScreen(chatSessionId: chat.chatSessionId),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

@@ -133,7 +133,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
                                   Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(
-                                      builder: (context) => const ChatScreen(),
+                                      builder: (context) => ChatScreen(chatSessionId: '',),
                                     ),
                                     (Route<dynamic> route) => false,
                                   );

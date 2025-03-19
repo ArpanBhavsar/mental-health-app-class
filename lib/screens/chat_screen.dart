@@ -14,7 +14,8 @@ import '../widgets/nav_drawer.dart';
 import 'chat_history_screen.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  String chatSessionId;
+  ChatScreen({super.key, required this.chatSessionId});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -25,7 +26,6 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isLoading = false;
 
   late final GenerativeModel model;
-  late final String chatSessionId;
   late final String userId;
   late String chatName;
 
@@ -60,12 +60,52 @@ class _ChatScreenState extends State<ChatScreen> {
     userId = prefs.getString('userId').toString();
     final now = DateTime.now().millisecondsSinceEpoch.toString();
     chatName = 'Chat on ${now.toString()}';
-    chatSessionId = sha256.convert(utf8.encode(userId + now)).toString();
+    print('Chat Session Id: ${widget.chatSessionId}');
+    if (widget.chatSessionId != '') {
+      widget.chatSessionId =
+          sha256.convert(utf8.encode(userId + now)).toString();
+    } else {
+      await _loadChatHistory();
+    }
   }
 
   final List<ChatMessage> _messages = [];
 
   final TextEditingController _textController = TextEditingController();
+
+  Future<void> _loadChatHistory() async {
+    setState(() {
+      _isLoading = true;
+    });
+    var apiResponse = await ApiService.get('chat/${widget.chatSessionId}');
+    if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+      final responseData = jsonDecode(apiResponse.body);
+      for (var message in responseData) {
+        print('Message: ${message['message']}');
+        print('Role: ${message['role']}');
+        if (message['message'] == null) {
+          continue;
+        }
+        setState(() {
+          _messages.add(
+            ChatMessage(text: message['message'], sender: message['role']),
+          );
+        });
+      }
+      setState(() {
+        chatName = responseData['chatName'];
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      final responseData = jsonDecode(apiResponse.body);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(responseData["message"])));
+    }
+  }
 
   Future<void> _handleSubmitted(String text) async {
     _textController.clear();
@@ -104,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen> {
         chatName = response.text!;
         _isLoading = true;
       });
-      var apiResponse = await ApiService.put('chat/$chatSessionId', {
+      var apiResponse = await ApiService.put('chat/${widget.chatSessionId}', {
         'chatName': chatName,
       });
 
@@ -127,10 +167,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final response = await chat.sendMessage(content);
     setState(() {
       if (response.text != null) {
-        _messages.insert(
-          0,
-          ChatMessage(text: response.text!, sender: "model"),
-        );
+        _messages.insert(0, ChatMessage(text: response.text!, sender: "model"));
       }
     });
 
@@ -139,7 +176,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     var apiResponse = await ApiService.post('chat', {
-      'chatSessionId': chatSessionId,
+      'chatSessionId': widget.chatSessionId,
       'chatName': chatName,
       'userId': userId,
       'message': text,
@@ -162,7 +199,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     if (response.text != null) {
       var apiResponse = await ApiService.post('chat', {
-        'chatSessionId': chatSessionId,
+        'chatSessionId': widget.chatSessionId,
         'chatName': chatName,
         'userId': userId,
         'message': response.text,
@@ -190,15 +227,19 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
-        actions: [IconButton(onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatHistoryScreen(userId: userId),
-            ),
-          );
-          
-        }, icon: Icon(Icons.history))],
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatHistoryScreen(userId: userId),
+                ),
+              );
+            },
+            icon: Icon(Icons.history),
+          ),
+        ],
       ),
       drawer: NavDrawer(selectedIndex: 0),
       body:
