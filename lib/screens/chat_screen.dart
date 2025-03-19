@@ -94,7 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
         });
       }
       print(responseData[0]);
-      final chat_Name = responseData[responseData.length - 1]['chatName'];
+      final chat_Name = responseData.last['chatName'];
       print(chat_Name);
       setState(() {
         chatName = chat_Name;
@@ -119,7 +119,7 @@ class _ChatScreenState extends State<ChatScreen> {
       chatHistory.add(Content(message.sender, [TextPart(message.text)]));
     }
     setState(() {
-      _messages.insert(0, ChatMessage(text: text, sender: "user"));
+      _messages.add(ChatMessage(text: text, sender: "user"));
     });
     if (_messages.length == 1) {
       chatName = text;
@@ -166,12 +166,15 @@ class _ChatScreenState extends State<ChatScreen> {
         ).showSnackBar(SnackBar(content: Text(responseData["message"])));
       }
     }
-    final chat = model.startChat(history: chatHistory);
+    final chat = model.startChat(
+      history:
+          _messages.map((m) => Content(m.sender, [TextPart(m.text)])).toList(),
+    );
     final content = Content.text(text);
     final response = await chat.sendMessage(content);
     setState(() {
       if (response.text != null) {
-        _messages.insert(0, ChatMessage(text: response.text!, sender: "model"));
+        _messages.add(ChatMessage(text: response.text!, sender: "model"));
       }
     });
 
