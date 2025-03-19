@@ -47,11 +47,9 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         });
       }
       setState(() {
-
         _filteredChats = List.from(_chats);
       });
-
-        } catch (e) {
+    } catch (e) {
       if (kDebugMode) {
         print('Error: $e');
       }
@@ -71,7 +69,9 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         });
         final List<dynamic> jsonData = jsonDecode(response.body);
 
-        return jsonData.map((item) => ChatListModel.fromJson(item)).toList(); // Map JSON to Chat objects
+        return jsonData
+            .map((item) => ChatListModel.fromJson(item))
+            .toList(); // Map JSON to Chat objects
       } else {
         setState(() {
           _isLoading = false;
@@ -104,9 +104,32 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     // You can customize the format as needed.
     // Example: 'yyyy-MM-dd HH:mm:ss' for '2023-10-27 10:30:00'
     // Example: 'MMM dd, yyyy hh:mm a' for 'Oct 27, 2023 10:30 AM'
-    String formattedDateTime = DateFormat('MMM dd, yyyy hh:mm a').format(pstDateTime);
+    String formattedDateTime = DateFormat(
+      'MMM dd, yyyy hh:mm a',
+    ).format(pstDateTime);
 
     return formattedDateTime;
+  }
+
+  Future<void> _deleteChat(String chatSessionId) async {
+    try {
+      final response = await ApiService.delete('chat/$chatSessionId');
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          print('Chat deleted successfully: $chatSessionId');
+        }
+        _loadChats();
+      } else {
+        throw Exception('Failed to delete chat');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting chat: $e');
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to delete chat: $e')));
+    }
   }
 
   @override
@@ -163,25 +186,29 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         ],
         bottom: bottomAppBar,
       ),
-      body: _isLoading?const Center(child:CircularProgressIndicator()):ListView.builder(
-        itemCount: _filteredChats.length,
-        itemBuilder: (context, index) {
-          final chat = _filteredChats[index];
-          return ListTile(
-            title: Text(chat.chatName, style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text(formatDateTimePST(chat.createdAt)),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                setState(() {
-                  _chats.removeAt(index);
-                });
-              },
-            ),
-            onTap: () {},
-          );
-        },
-      ),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                itemCount: _filteredChats.length,
+                itemBuilder: (context, index) {
+                  final chat = _filteredChats[index];
+                  return ListTile(
+                    title: Text(
+                      chat.chatName,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(formatDateTimePST(chat.createdAt)),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        _deleteChat(chat.chatSessionId);
+                      },
+                    ),
+                    onTap: () {},
+                  );
+                },
+              ),
     );
   }
 }
