@@ -59,11 +59,11 @@ class _ChatScreenState extends State<ChatScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId = prefs.getString('userId').toString();
     final now = DateTime.now().millisecondsSinceEpoch.toString();
-    chatName = 'Chat on ${now.toString()}';
     print('Chat Session Id: ${widget.chatSessionId}');
-    if (widget.chatSessionId != '') {
+    if (widget.chatSessionId == '') {
       widget.chatSessionId =
           sha256.convert(utf8.encode(userId + now)).toString();
+      chatName = 'Chat on ${now.toString()}';
     } else {
       await _loadChatHistory();
     }
@@ -83,6 +83,7 @@ class _ChatScreenState extends State<ChatScreen> {
       for (var message in responseData) {
         print('Message: ${message['message']}');
         print('Role: ${message['role']}');
+        print('ChatName: ${message['chatName']}');
         if (message['message'] == null) {
           continue;
         }
@@ -92,8 +93,11 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         });
       }
+      print(responseData[0]);
+      final chat_Name = responseData[responseData.length - 1]['chatName'];
+      print(chat_Name);
       setState(() {
-        chatName = responseData['chatName'];
+        chatName = chat_Name;
         _isLoading = false;
       });
     } else {
