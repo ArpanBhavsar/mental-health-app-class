@@ -104,7 +104,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     // You can customize the format as needed.
     // Example: 'yyyy-MM-dd HH:mm:ss' for '2023-10-27 10:30:00'
     // Example: 'MMM dd, yyyy hh:mm a' for 'Oct 27, 2023 10:30 AM'
-    String formattedDateTime = DateFormat('yyyy-MM-dd hh:mm a').format(pstDateTime);
+    String formattedDateTime = DateFormat('MMM dd, yyyy hh:mm a').format(pstDateTime);
 
     return formattedDateTime;
   }
@@ -168,7 +168,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         itemBuilder: (context, index) {
           final chat = _filteredChats[index];
           return ListTile(
-            title: Text(chat.chatName),
+            title: Text(chat.chatName, style: TextStyle(fontWeight: FontWeight.bold),),
             subtitle: Text(formatDateTimePST(chat.createdAt)),
             trailing: IconButton(
               icon: const Icon(Icons.delete),
