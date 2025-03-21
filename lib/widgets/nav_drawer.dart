@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/screens/chat_screen.dart';
 import 'package:myapp/screens/login_screen.dart';
+import 'package:myapp/screens/mood_logging_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NavDrawer extends StatefulWidget {
@@ -14,8 +16,8 @@ class _NavDrawerState extends State<NavDrawer> {
   @override
   Widget build(BuildContext context) {
     final Map<int, Widget> screens = {
-      0: Placeholder(), // Replace with actual screen widgets
-      1: Placeholder(),
+      0: ChatScreen(chatSessionId: '',), // Replace with actual screen widgets
+      1: MoodLoggingScreen(),
       2: Placeholder(),
       // 3 is for log out action, not a screen
     };
