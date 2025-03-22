@@ -87,7 +87,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: _isLoading ? const Center(child: CircularProgressIndicator(),):Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [

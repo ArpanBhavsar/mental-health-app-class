@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ViewJournalScreen extends StatefulWidget {
   final String title;
   final String content;
-  final DateTime date;
+  final String date;
 
   const ViewJournalScreen({
     Key? key,

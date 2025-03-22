@@ -1,6 +1,10 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:1487831153.
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/screens/view_journal_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/api_service.dart';
@@ -60,6 +64,33 @@ class _JournalListScreenState extends State<JournalListScreen> {
     }
   }
 
+  Future<void> _deleteJournal(String journalId) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final response = await ApiService.delete('journal/$journalId');
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          print('Journal deleted successfully: $journalId');
+        }
+        setState(() {
+          _isLoading = false;
+        });
+        _loadJournalsList();
+      } else {
+        throw Exception('Failed to delete journal');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting journal: $e');
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to delete journal: $e')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,13 +109,28 @@ class _JournalListScreenState extends State<JournalListScreen> {
         title: const Text('Journal Entries'),
       ),
       drawer: const NavDrawer(selectedIndex: 2),
-      body: ListView.builder(
+      body: _isLoading ? const Center(child: CircularProgressIndicator()) : ListView.builder(
         itemCount: _journalEntries.length,
         itemBuilder: (context, index) {
           final journal = _journalEntries[index];
+          DateTime dateTime = DateTime.parse(journal.createdAt).toLocal();
+          var format = DateFormat('dd MMM, yyyy hh:MM a');
+          String formattedDate = format.format(dateTime.toUtc().add(const Duration(hours: -8)));
           return ListTile(
             title: Text(journal.title),
-            subtitle: Text(journal.createdAt),
+            subtitle: Text(formattedDate),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => ViewJournalScreen(
+                        title: journal.title,
+                        content: journal.journalEntry,
+                        date: formattedDate,
+                      ),
+                ),
+              );
+            },
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -94,7 +140,12 @@ class _JournalListScreenState extends State<JournalListScreen> {
                     // Handle edit action
                   },
                 ),
-                IconButton(icon: const Icon(Icons.delete), onPressed: () {}),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    _deleteJournal(journal.journalId);
+                  },
+                ),
               ],
             ),
           );
