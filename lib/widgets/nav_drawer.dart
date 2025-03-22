@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/screens/chat_screen.dart';
+import 'package:myapp/screens/journal_list_screen.dart';
 import 'package:myapp/screens/login_screen.dart';
 import 'package:myapp/screens/mood_logging_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +19,7 @@ class _NavDrawerState extends State<NavDrawer> {
     final Map<int, Widget> screens = {
       0: ChatScreen(chatSessionId: '',), // Replace with actual screen widgets
       1: MoodLoggingScreen(),
-      2: Placeholder(),
+      2: JournalListScreen(),
       // 3 is for log out action, not a screen
     };
     return Drawer(

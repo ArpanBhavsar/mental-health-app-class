@@ -402,13 +402,14 @@ class ChatBubble extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          Stack(
-            alignment: Alignment.topRight,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              Flexible(
+                child: Container(
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.7,
                 ),
@@ -423,10 +424,15 @@ class ChatBubble extends StatelessWidget {
                   message.text,
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.copy, size: 16, color: Colors.white70),
+              ),
+               Padding(
+                 padding: const EdgeInsets.only(top: 10.0),
+                 child: IconButton(
+                  icon: const Icon(Icons.copy, size: 16),
+                  color: Theme.of(context).colorScheme.primary,
                 onPressed: () => _copyToClipboard(context, message.text),
                 tooltip: "Copy",
+                                 ),
               ),
             ],
           ),
@@ -435,4 +441,3 @@ class ChatBubble extends StatelessWidget {
     );
   }
 }
-

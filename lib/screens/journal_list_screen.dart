@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/nav_drawer.dart';
+import 'journaling_chat_screen.dart';
+import 'journal_entry_screen.dart';
+
 class JournalListScreen extends StatefulWidget {
   const JournalListScreen({super.key});
 
@@ -12,8 +16,22 @@ class _JournalListScreenState extends State<JournalListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.chat),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => JournalingChatScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+
         title: const Text('Journal Entries'),
       ),
+      drawer: const NavDrawer(selectedIndex: 2),
       body: ListView.builder(
         itemCount: 0, // Replace with actual data length later
         itemBuilder: (context, index) {
@@ -40,6 +58,17 @@ class _JournalListScreenState extends State<JournalListScreen> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const JournalEntryScreen(),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
