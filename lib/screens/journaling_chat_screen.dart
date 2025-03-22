@@ -13,15 +13,15 @@ import '../services/api_service.dart';
 import '../widgets/nav_drawer.dart';
 import 'chat_history_screen.dart';
 
-class ChatScreen extends StatefulWidget {
+class JournalingChatScreen extends StatefulWidget {
   String chatSessionId;
-  ChatScreen({super.key, required this.chatSessionId});
+  JournalingChatScreen({super.key, required this.chatSessionId});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<JournalingChatScreen> createState() => _JournalingChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _JournalingChatScreenState extends State<JournalingChatScreen> {
   final apiKey = dotenv.env['GEMINI_API_KEY'];
   bool _isLoading = false;
   bool _isAtBottom = true; // Tracks if user is at the bottom
@@ -382,17 +382,11 @@ class ChatBubble extends StatelessWidget {
   final ChatMessage message;
   const ChatBubble({Key? key, required this.message}) : super(key: key);
 
-  void _copyToClipboard(BuildContext context, String text) async {
-    try {
-      await Clipboard.setData(ClipboardData(text: text));
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Copied to clipboard")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to copy: $e")),
-      );
-    }
+  void _copyToClipboard(BuildContext context, String text) {
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Copied to clipboard")),
+    );
   }
 
   @override
@@ -405,34 +399,27 @@ class ChatBubble extends StatelessWidget {
         mainAxisAlignment:
             isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          Stack(
-            alignment: Alignment.topRight,
-            children: [
-              Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.7,
-                ),
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  color: isUser
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.secondary,
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: SelectableText(
-                  message.text,
-                ),
+          GestureDetector(
+            onLongPress: () => _copyToClipboard(context, message.text), // For mobile
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.7,
               ),
-              IconButton(
-                icon: const Icon(Icons.copy, size: 16, color: Colors.white70),
-                onPressed: () => _copyToClipboard(context, message.text),
-                tooltip: "Copy",
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: isUser
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.secondary,
+                borderRadius: BorderRadius.circular(10.0),
               ),
-            ],
+              child: SelectableText( // Enables text selection (for web/desktop)
+                message.text,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 }
-
