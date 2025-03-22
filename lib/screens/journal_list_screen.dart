@@ -1,5 +1,10 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../services/api_service.dart';
+import '../models/journal_model.dart';
 import '../widgets/nav_drawer.dart';
 import 'journaling_chat_screen.dart';
 import 'journal_entry_screen.dart';
@@ -12,6 +17,49 @@ class JournalListScreen extends StatefulWidget {
 }
 
 class _JournalListScreenState extends State<JournalListScreen> {
+  final List<JournalModel> _journalEntries = [];
+  late final String userId;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLogin();
+  }
+
+  _checkLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('userId').toString();
+    await _loadJournalsList();
+  }
+
+  Future<void> _loadJournalsList() async {
+    setState(() {
+      _isLoading = true;
+    });
+    var apiResponse = await ApiService.get('journals/$userId');
+    if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+      final responseData = jsonDecode(apiResponse.body);
+      setState(() {
+        _journalEntries.clear();
+        for (var journal in responseData) {
+          if (journal['message'] == null) {
+            _journalEntries.add(JournalModel.fromJson(journal));
+          }
+        }
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      final responseData = jsonDecode(apiResponse.body);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(responseData["message"])));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,9 +69,7 @@ class _JournalListScreenState extends State<JournalListScreen> {
             icon: const Icon(Icons.chat),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => JournalingChatScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => JournalingChatScreen()),
               );
             },
           ),
@@ -33,12 +79,12 @@ class _JournalListScreenState extends State<JournalListScreen> {
       ),
       drawer: const NavDrawer(selectedIndex: 2),
       body: ListView.builder(
-        itemCount: 0, // Replace with actual data length later
+        itemCount: _journalEntries.length,
         itemBuilder: (context, index) {
-          // Replace with actual list tile for each entry
+          final journal = _journalEntries[index];
           return ListTile(
-            title: Text('Entry Title $index'),
-            subtitle: Text('Date/Time'),
+            title: Text(journal.title),
+            subtitle: Text(journal.createdAt),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -48,11 +94,7 @@ class _JournalListScreenState extends State<JournalListScreen> {
                     // Handle edit action
                   },
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                  },
-                ),
+                IconButton(icon: const Icon(Icons.delete), onPressed: () {}),
               ],
             ),
           );
@@ -61,9 +103,7 @@ class _JournalListScreenState extends State<JournalListScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const JournalEntryScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const JournalEntryScreen()),
           );
         },
         child: const Icon(Icons.add),
