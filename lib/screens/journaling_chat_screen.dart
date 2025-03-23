@@ -16,11 +16,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import '../widgets/nav_drawer.dart';
-import 'chat_history_screen.dart';
+
 
 class JournalingChatScreen extends StatefulWidget {
-  JournalingChatScreen({super.key});
+  const JournalingChatScreen({super.key});
 
   @override
   State<JournalingChatScreen> createState() => _JournalingChatScreenState();
@@ -42,8 +41,9 @@ class _JournalingChatScreenState extends State<JournalingChatScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollDebounceTimer?.isActive ?? false)
+      if (_scrollDebounceTimer?.isActive ?? false) {
         _scrollDebounceTimer!.cancel();
+      }
       _scrollDebounceTimer = Timer(const Duration(milliseconds: 100), () {
         final atBottom =
             _scrollController.position.pixels >=
