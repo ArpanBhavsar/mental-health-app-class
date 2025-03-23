@@ -17,7 +17,7 @@ class _NavDrawerState extends State<NavDrawer> {
   @override
   Widget build(BuildContext context) {
     final Map<int, Widget> screens = {
-      0: ChatScreen(chatSessionId: '',), // Replace with actual screen widgets
+      0: ChatScreen(chatSessionId: ''), // Replace with actual screen widgets
       1: MoodLoggingScreen(),
       2: JournalListScreen(),
       // 3 is for log out action, not a screen
@@ -44,24 +44,15 @@ class _NavDrawerState extends State<NavDrawer> {
               'assets/images/self-love.png',
               width: 24,
               height: 24,
-              color:
-                  widget.selectedIndex == 0
-                      ? Theme.of(context).colorScheme.onPrimary
-                      : Theme.of(context).colorScheme.onSecondary,
+              color: widget.selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSecondary,
             ),
-            title: Text(
-              'Aura AI Counselling',
-              style: TextStyle(
-                color:
-                    widget.selectedIndex == 0
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(context).colorScheme.onSecondary,
-              ),
-            ),
+            title: Text('Aura AI Counselling', style: TextStyle(color: widget.selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSecondary)),
             selected: widget.selectedIndex == 0, // Highlight if selected
             onTap: () {
-              Navigator.of(context).pushReplacement(
+              Navigator.pushAndRemoveUntil(
+                context,
                 MaterialPageRoute(builder: (context) => screens[0]!),
+                (Route<dynamic> route) => false, // This removes all previous routes
               );
             },
           ),
@@ -70,24 +61,15 @@ class _NavDrawerState extends State<NavDrawer> {
               'assets/images/mood.png',
               width: 24,
               height: 24,
-              color:
-                  widget.selectedIndex == 1
-                      ? Theme.of(context).colorScheme.onPrimary
-                      : Theme.of(context).colorScheme.onSecondary,
+              color: widget.selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSecondary,
             ),
-            title: Text(
-              'Mood Logging',
-              style: TextStyle(
-                color:
-                    widget.selectedIndex == 1
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(context).colorScheme.onSecondary,
-              ),
-            ),
+            title: Text('Mood Logging', style: TextStyle(color: widget.selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSecondary)),
             selected: widget.selectedIndex == 1, // Highlight if selected
             onTap: () {
-              Navigator.of(context).pushReplacement(
+              Navigator.pushAndRemoveUntil(
+                context,
                 MaterialPageRoute(builder: (context) => screens[1]!),
+                (Route<dynamic> route) => false, // This removes all previous routes
               );
             },
           ),
@@ -96,52 +78,26 @@ class _NavDrawerState extends State<NavDrawer> {
               'assets/images/diary.png',
               width: 24,
               height: 24,
-              color:
-                  widget.selectedIndex == 2
-                      ? Theme.of(context).colorScheme.onPrimary
-                      : Theme.of(context).colorScheme.onSecondary,
+              color: widget.selectedIndex == 2 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSecondary,
             ),
-            title: Text(
-              'Journaling',
-              style: TextStyle(
-                color:
-                    widget.selectedIndex == 2
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(context).colorScheme.onSecondary,
-              ),
-            ),
+            title: Text('Journaling', style: TextStyle(color: widget.selectedIndex == 2 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSecondary)),
             selected: widget.selectedIndex == 2, // Highlight if selected
             onTap: () {
-              Navigator.of(context).pushReplacement(
+              Navigator.pushAndRemoveUntil(
+                context,
                 MaterialPageRoute(builder: (context) => screens[2]!),
+                (Route<dynamic> route) => false, // This removes all previous routes
               );
             },
           ),
           ListTile(
-            leading: Icon(
-              Icons.logout,
-              color:
-                  widget.selectedIndex == 3
-                      ? Theme.of(context).colorScheme.onPrimary
-                      : Theme.of(context).colorScheme.onSecondary,
-            ),
-            title: Text(
-              'Log Out',
-              style: TextStyle(
-                color:
-                    widget.selectedIndex == 3
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(context).colorScheme.onSecondary,
-              ),
-            ),
+            leading: Icon(Icons.logout, color: widget.selectedIndex == 3 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSecondary),
+            title: Text('Log Out', style: TextStyle(color: widget.selectedIndex == 3 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSecondary)),
             selected: widget.selectedIndex == 3, // Highlight if selected
             onTap: () async {
               final prefs = await SharedPreferences.getInstance();
               prefs.remove("userId");
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const LogInScreen()),
-                (route) => false,
-              );
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const LogInScreen()), (route) => false);
             },
           ),
         ],
